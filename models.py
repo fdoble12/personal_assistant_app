@@ -7,55 +7,53 @@ from datetime import datetime
 
 
 class QuestionData(BaseModel):
-    """Model for conversational questions — NOT saved to the database"""
+    """Conversational question — answered directly, NOT saved to DB"""
     type: Literal["question"] = "question"
     confidence: float = Field(ge=0.0, le=1.0)
-    answer: str = Field(min_length=1, description="Claude's direct answer to the user")
+    answer: str = Field(min_length=1)
 
 
 class NoteData(BaseModel):
-    """Model for note/brain dump entries"""
+    """Note / brain dump entry"""
     type: Literal["note"] = "note"
     confidence: float = Field(ge=0.0, le=1.0)
-    content: str = Field(min_length=1, description="Original user message")
-    summary: str = Field(min_length=1, description="One-sentence summary")
-    tags: List[str] = Field(default_factory=list, description="Extracted tags/topics")
+    content: str = Field(min_length=1)
+    summary: str = Field(min_length=1)
+    tags: List[str] = Field(default_factory=list)
 
 
 class FoodData(BaseModel):
-    """Model for food log entries"""
+    """Food log entry"""
     type: Literal["food"] = "food"
     confidence: float = Field(ge=0.0, le=1.0)
-    food_description: str = Field(min_length=1, description="Description of food")
-    calories: int = Field(ge=0, description="Estimated calories")
-    protein: float = Field(ge=0.0, description="Protein in grams")
-    carbs: float = Field(ge=0.0, description="Carbohydrates in grams")
-    fat: float = Field(ge=0.0, description="Fat in grams")
+    food_description: str = Field(min_length=1)
+    calories: int = Field(ge=0)
+    protein: float = Field(ge=0.0)
+    carbs: float = Field(ge=0.0)
+    fat: float = Field(ge=0.0)
 
-    @field_validator("calories", "protein", "carbs", "fat")
+    @field_validator("protein", "carbs", "fat")
     @classmethod
     def round_values(cls, v):
-        if isinstance(v, float):
-            return round(v, 1)
-        return v
+        return round(float(v), 1)
 
 
 class WorkoutData(BaseModel):
-    """Model for workout entries"""
+    """Workout entry"""
     type: Literal["workout"] = "workout"
     confidence: float = Field(ge=0.0, le=1.0)
-    activity_type: str = Field(min_length=1, description="Type of exercise")
-    duration_mins: int = Field(ge=1, description="Duration in minutes")
-    distance_km: Optional[float] = Field(None, ge=0.0, description="Distance if applicable")
-    notes: Optional[str] = Field(None, description="Additional notes about workout")
+    activity_type: str = Field(min_length=1)
+    duration_mins: int = Field(ge=1)
+    distance_km: Optional[float] = Field(None, ge=0.0)
+    notes: Optional[str] = None
 
 
-# Union type for all possible Claude responses
+# Union of all Claude response types
 ClassifiedMessage = Union[QuestionData, NoteData, FoodData, WorkoutData]
 
 
 class DailySummary(BaseModel):
-    """Model for daily summary report"""
+    """Aggregated daily stats"""
     date: str
     total_calories: int = 0
     total_protein: float = 0.0
@@ -70,8 +68,23 @@ class DailySummary(BaseModel):
 
 
 class UserProfile(BaseModel):
-    """Model for user profile data"""
+    """Full user profile including macro targets"""
     telegram_id: int
-    goal_weight: Optional[float] = None
     current_weight: Optional[float] = None
+    goal_weight: Optional[float] = None
     daily_calorie_target: Optional[int] = None
+    # Macro targets in grams
+    protein_target: Optional[float] = None
+    carbs_target: Optional[float] = None
+    fat_target: Optional[float] = None
+
+    def has_macro_targets(self) -> bool:
+        return all([self.protein_target, self.carbs_target, self.fat_target])
+
+    def macro_summary(self) -> str:
+        """One-line display of macro targets."""
+        if not self.has_macro_targets():
+            return "No macro targets set — use /setmacros"
+        return (f"P: {self.protein_target}g | "
+                f"C: {self.carbs_target}g | "
+                f"F: {self.fat_target}g")
