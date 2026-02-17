@@ -1,0 +1,13 @@
+[build]
+builder = "NIXPACKS"
+
+[build.buildCommand]
+cmd = "pip install -r requirements-bot.txt"
+
+[deploy]
+startCommand = "python bot.py"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5
+
+[deploy.healthcheck]
+# No HTTP port needed — this is a long-running process, not a web server

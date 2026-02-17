@@ -1,0 +1,9 @@
+# Bot-only dependencies for Railway deployment
+# Do NOT install on Streamlit Cloud (use requirements-dashboard.txt there)
+
+python-telegram-bot>=20.7
+supabase==2.3.4
+anthropic>=0.18.1
+pydantic>=2.6.1
+python-dotenv>=1.0.1
+httpx>=0.26.0
