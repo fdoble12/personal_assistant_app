@@ -1,0 +1,17 @@
+# Core dependencies
+streamlit>=1.31.0
+supabase>=2.3.4
+python-telegram-bot>=20.7
+anthropic>=0.18.1
+pydantic>=2.6.1
+
+# Data analysis and visualization (using flexible versions for Windows compatibility)
+pandas>=2.2.0
+plotly>=5.18.0
+numpy>=1.26.0
+
+# Environment management
+python-dotenv>=1.0.1
+
+# Utilities
+httpx>=0.26.0
