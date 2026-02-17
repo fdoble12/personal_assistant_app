@@ -1,0 +1,10 @@
+# PythonAnywhere bot dependencies
+# Install via: pip3.10 install --user -r requirements-pythonanywhere.txt
+
+flask>=3.0.0
+python-telegram-bot>=20.7
+supabase
+anthropic>=0.18.1
+pydantic>=2.6.1
+python-dotenv>=1.0.1
+httpx>=0.26.0
